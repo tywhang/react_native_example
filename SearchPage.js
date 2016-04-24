@@ -96,6 +96,14 @@ class SearchPage extends Component {
   _executeQuery(query) {
     console.log(query);
     this.setState({ isLoading: true });
+    fetch(query)
+      .then(response => response.json())
+      .then(json => this._handleResponse(json.response))
+      .catch(error =>
+        this.setState({
+          isLoading: false,
+          message: 'Something bad happened ' + error
+        }));
   }
 
   _handleResponse(response) {
@@ -114,14 +122,23 @@ class SearchPage extends Component {
   onSearchPressed() {
     var query = urlForQueryAndPage('place_name', this.state.searchString, 1);
     this._executeQuery(query);
-    fetch(query)
-      .then(response => response.json())
-      .then(json => this._handleResponse(json.response))
-      .catch(error =>
+  }
+
+  onLocationPressed() {
+    navigator.geolocation.getCurrentPosition(
+      location => {
+        var search = location.coords.latitude + ',' +
+          location.coords.longitude;
+        this.setState({ searchString: search});
+        var query = urlForQueryAndPage('centre_point', search, 1);
+        this._executeQuery(query);
+      },
+      error => {
         this.setState({
-          isLoading: false,
-          message: 'Something bad happened ' + error
-        }));
+          message: 'There was a problem with obtaining your location: ' + error
+        });
+      }
+    );
   }
 
   render() {
@@ -151,7 +168,7 @@ class SearchPage extends Component {
         </View>
         <TouchableHighlight style={styles.button}
           underlayColor='#99d9f4'>
-          <Text style={styles.buttonText}>Location</Text>
+          <Text style={styles.buttonText} onPress={this.onLocationPressed.bind(this)}>Location</Text>
         </TouchableHighlight>
         <Image source={require('./Resources/house.png')} style={styles.image}/>
         {spinner}
