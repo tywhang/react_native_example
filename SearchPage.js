@@ -10,7 +10,7 @@ var {
   ActivityIndicatorIOS,
   Image,
   Component
-} = React;
+} = React; 
 
 var styles = StyleSheet.create({
   description: {
@@ -59,7 +59,21 @@ var styles = StyleSheet.create({
 });
 
 class SearchPage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      searchString: 'london'
+    };
+  }
+
+  onSearchTextChanged(event) {
+    console.log('onSearchTextChanged');
+    this.setState({ searchString: event.nativeEvent.text });
+    console.log(this.state.searchString);
+  }
+
   render() {
+    console.log('SearchPage.render');
     return (
       <View style={styles.container}>
         <Text style={styles.description}>
@@ -71,7 +85,9 @@ class SearchPage extends Component {
         <View style={styles.flowRight}>
           <TextInput
             style={styles.searchInput}
-            placeholder='Search via name or postcode' />
+            value={this.state.searchString}
+            onChange={this.onSearchTextChanged.bind(this)}
+            placeholder='Search via name or postcode'/>
           <TouchableHighlight style={styles.button}
             underlayColor='#99d9f4'>
             <Text style={styles.buttonText}>Go</Text>
@@ -81,6 +97,7 @@ class SearchPage extends Component {
           underlayColor='#99d9f4'>
           <Text style={styles.buttonText}>Location</Text>
         </TouchableHighlight>
+        <Image source={require('./Resources/house.png')} style={styles.image}/>
       </View>
     );
   }
